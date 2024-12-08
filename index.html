@@ -1,205 +1,471 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-    <meta name="description" content="">
-    <meta name="author" content="">
-    <link rel="icon" href="favicon.ico">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hossein Ghodrati</title>
+    <style>
+        :root {
+            --hue: 220;
+            --text-color: hsl(var(--hue), 100%, 8%);
+            --background-color: hsl(var(--hue), 10%, 98%);
+            --cursor-color: #cd523d;
+            --font-weight-normal: 200;
+            --font-weight-medium: 400;
+            --font-weight-bold: 600;
+            --line-height: 1.33;
+        }
 
-    <title>Homepage | Hossein Ghodrati Noushahr</title>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --text-color: #fff;
+                --background-color: #16161d;
+                --cursor-color: #ff735a;
+            }
+        }
 
-    <!-- Bootstrap core CSS -->
-    <link href="dist/css/bootstrap.min.css" rel="stylesheet">
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-    <link href="assets/css/ie10-viewport-bug-workaround.css" rel="stylesheet">
+        html, body {
+            height: 100%;
+            overflow: hidden;
+        }
 
-    <!-- Custom styles for this template -->
-    <link href="starter-template.css" rel="stylesheet">
+        body {
+            font-family: 'Monaspace Neon', monospace;
+            font-weight: var(--font-weight-normal);
+            font-size: calc(max(3.1415926535vmin, 16px));
+            line-height: var(--line-height);
+            background: var(--background-color);
+            color: var(--text-color);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
 
-    <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
-    <!--[if lt IE 9]><script src="assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
-    <script src="assets/js/ie-emulation-modes-warning.js"></script>
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            overflow: hidden;
+            z-index: -1;
+        }
 
-    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
-    <!--[if lt IE 9]>
-      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
-      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-    <![endif]-->
+        .circle {
+            position: absolute;
+            width: 100vmax;
+            height: 100vmax;
+            border-radius: 50%;
+            filter: blur(80px);
+            mix-blend-mode: screen;
+            left: 40%;
+            top: -80vmax;
+        }
+
+        #circle1 {
+            background-color: #ebdf8799;
+            animation: orbit 6s linear infinite;
+        }
+
+        #circle2 {
+            background-color: #00c8ff99;
+            animation: rorbit 10s linear infinite;
+        }
+
+        #circle3 {
+            background-color: #feb6ff99;
+            animation: rorbit 8s linear infinite;
+        }
+
+        @keyframes orbit {
+            0% { transform: rotate(0deg) translateX(20vmin) rotate(0deg); }
+            100% { transform: rotate(360deg) translateX(20vmin) rotate(-360deg); }
+        }
+
+        @keyframes rorbit {
+            100% { transform: rotate(0deg) translateX(20vmin) rotate(0deg); }
+            0% { transform: rotate(360deg) translateX(20vmin) rotate(-360deg); }
+        }
+
+        .terminal-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            /* Increased bottom space to account for command line height + padding + descender space */
+            bottom: 4em;
+            overflow-y: auto;
+            padding: 1.5em;
+            /* Added padding at the bottom to prevent text cutoff */
+            padding-bottom: 0.5em;
+            scrollbar-width: thin;
+            -ms-overflow-style: thin;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: flex-start;
+        }
+
+        .terminal-container::-webkit-scrollbar {
+            display: thin;
+        }
+
+        .terminal {
+            max-width: 100%;
+            margin-top: auto;
+        }
+
+        .command-line-container {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 1.5em;
+            /* Added a subtle shadow to better separate from content */
+            /* box-shadow: 0 -1px 0 rgba(0,0,0,0.05); */
+            background: var(--background-color);
+            z-index: 1000;
+        }
+
+        .command-line {
+            display: flex;
+            align-items: center;
+            position: relative;
+        }
+
+        .prompt {
+            cursor: pointer;
+            white-space: pre;
+        }
+
+        .input {
+            background: transparent;
+            border: none;
+            color: var(--text-color);
+            font-family: inherit;
+            font-size: inherit;
+            font-weight: inherit;
+            outline: none;
+            flex-grow: 1;
+            padding: 0;
+            margin: 0;
+            position: relative;
+        }
+
+        .cursor {
+            display: inline-block;
+            width: 0.6em;
+            height: 1.2em;
+            background: var(--cursor-color);
+            animation: blink 1s infinite;
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .output {
+            margin-bottom: 0.5em;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .output.visible {
+            opacity: 1;
+        }
+
+        button {
+            background: none;
+            border: none;
+            color: var(--cursor-color);
+            font-family: inherit;
+            font-size: inherit;
+            font-weight: var(--font-weight-medium);
+            padding: 0;
+            cursor: pointer;
+            text-align: left;
+            position: relative;
+            padding-left: 1em;
+            margin-left: -1em;
+        }
+
+        button:hover::before {
+            content: ">";
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        @keyframes blink {
+            50% { opacity: 0; }
+        }
+
+        .menu-item {
+            display: block;
+            margin: 0.5em 0;
+        }
+
+        /* Add new styles for tabular content */
+        .table-row {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 0.5em;
+        }
+
+        .table-cell {
+            flex: 0 0 auto;
+        }
+
+        .table-label {
+            width: 8em;
+            color: var(--cursor-color);
+        }
+
+        .table-label-no-color {
+            width: 8em;
+        }
+
+        .table-content {
+            flex: 1;
+            margin-left: 1em;
+            word-wrap: break-word;
+        }
+
+        /* Link styling */
+        .table-content a {
+            color: var(--cursor-color);
+            text-decoration: none;
+        }
+
+        .table-content a:hover {
+            text-decoration: underline;
+        }
+
+        /* For empty rows/spacers */
+        .spacer {
+            height: 1em;
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-animation">
+        <div class="circle" id="circle1"></div>
+        <div class="circle" id="circle2"></div>
+        <div class="circle" id="circle3"></div>
+    </div>
+    
+    <div class="terminal-container">
+        <div class="terminal">
+            <div class="output">Hossein Ghodrati CLI v0.1</div>
+            <div class="output">Connection established.</div>
+            <div class="output">Explore your options.</div>
+        </div>
+    </div>
+
+    <div class="command-line-container">
+        <div class="command-line">
+            <span class="prompt"></span>
+            <input class="input" type="text" autocomplete="off" style="display: none">
+            <div class="cursor" style="display: none"></div>
+        </div>
+    </div>
 
     <script>
-      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+        document.addEventListener('DOMContentLoaded', function() {
+            const terminal = document.querySelector('.terminal');
+            const terminalContainer = document.querySelector('.terminal-container');
+            const input = document.querySelector('.input');
+            const prompt = document.querySelector('.prompt');
+            const cursor = document.querySelector('.cursor');
+            const headerTexts = document.querySelectorAll('.output');
 
-      ga('create', 'UA-85215787-1', 'auto');
-      ga('send', 'pageview');
+            const commands = {
+                'about': [
+                    "I am a mission-driven tech leader and builder.",
+                    "I have over 10 years of success building products, teams, and leaders in diverse environments.",
+                    "I am passionate about data-driven solutions, distributed systems, and intelligent automation.",
+                    "I enjoy both creating new products and improving existing ones at scale.",
+                    "I approach problems with technical rigor, algorithmic design, and robust architecture.",
+                ],
+                'bio': [
+                    formatBio({
+                        name: "Hossein Ghodrati",
+                        title: "CTO @ VC backed startup (stealth)",
+                        experience: [
+                            "Director @ Affirm (2021-2024)",
+                            "Head of Data @ Returnly (2019-2021)",
+                            "Data Science @ Cimpress / Vistaprint (2014-2019)",
+                            "Boston Consulting Group (2012-2014)",
+                            "PricewaterhouseCoopers (2011-2012)",
+                        ],
+                    })
+                ],
+                'expertise': [
+                    `<div class="menu-item"><button onclick="handleCommand('expertise analytics')" onmouseover="previewCommand('expertise analytics')" onmouseout="clearCommand()">analytics</button></div>`,
+                    `<div class="menu-item"><button onclick="handleCommand('expertise ai')" onmouseover="previewCommand('expertise ai')" onmouseout="clearCommand()">ai</button></div>`,
+                    `<div class="menu-item"><button onclick="handleCommand('expertise software engineering')" onmouseover="previewCommand('expertise software engineering')" onmouseout="clearCommand()">software engineering</button></div>`,
+                ],
+                'expertise analytics': [
+                    "strategy & business analysis, pricing, sales & marketing analytics, product analytics, web analytics, a/b testing, analytics engineering",
+                ],
+                'expertise ai': [
+                    "personalization, recommender systems, propensity modeling, natural language processing, text mining, information retrieval, computer vision, anomaly detection",
+                ],
+                'expertise software engineering': [
+                    "agile software development, extreme programming, test-driven development, continuous integration / deployment, observability",
+                ],
+                'contact': [
+                    formatContact({
+                        links: [
+                            ["github", "hqdrt", "https://github.com/hqdrt"],
+                            ["linkedin", "hghodrati", "https://www.linkedin.com/in/hghodrati"]
+                        ]
+                    })
+                ],
+                'ls': [
+                    `<div class="menu-item"><button onclick="handleCommand('about')" onmouseover="previewCommand('about')" onmouseout="clearCommand()">about</button></div>`,
+                    `<div class="menu-item"><button onclick="handleCommand('bio')" onmouseover="previewCommand('bio')" onmouseout="clearCommand()">bio</button></div>`,
+                    `<div class="menu-item"><button onclick="handleCommand('expertise')" onmouseover="previewCommand('expertise')" onmouseout="clearCommand()">expertise</button></div>`,
+                    `<div class="menu-item"><button onclick="handleCommand('contact')" onmouseover="previewCommand('contact')" onmouseout="clearCommand()">contact</button></div>`,
+                ]
+            };
 
+            function formatBio(bio) {
+                return output = [
+                    `<div class="table-row">
+                        <div class="table-cell table-label">name</div>
+                        <div class="table-cell table-content">${bio.name}</div>
+                    </div>`,
+
+                    bio.title ? `<div class="table-row">
+                        <div class="table-cell table-label">title</div>
+                        <div class="table-cell table-content">${bio.title}</div>
+                    </div>` : '',
+
+                    `<div class="spacer"></div>`,
+
+                    bio.experience ? `<div class="table-row">
+                        <div class="table-cell table-label">experience</div>
+                        <div class="table-cell table-content">${bio.experience.join("<br>")}</div>
+                    </div>
+                    <div class="spacer"></div>` : '',
+                ].join('');
+            }
+
+            function formatContact(contact) {
+                return output = [
+                    `${contact.links.map(([label, handle, url]) => `<div class="table-row"><div class="table-cell table-label-no-color">${label}</div><div class="table-cell table-content"><a href="${url}" target="_blank">${handle}</a></div></div>`).join("")}`,
+                ].join('');
+            }
+
+            function scrollToBottom() {
+                terminalContainer.scrollTo({
+                    top: terminalContainer.scrollHeight,
+                    behavior: 'smooth'
+                });
+            }
+
+            function updateCursorPosition() {
+                const promptRect = prompt.getBoundingClientRect();
+                cursor.style.left = (promptRect.width + (input.value.length * 0)) + 'px';
+            }
+
+            window.clearCommand = function() {
+                input.value = '';
+            };
+
+            window.previewCommand = function(cmd) {
+                input.value = cmd;
+                input.focus();
+            };
+
+            async function createOutput(text, isHtml = false, delay = 50) {
+                const output = document.createElement('div');
+                output.className = 'output';
+                
+                if (isHtml) {
+                    output.innerHTML = text;
+                } else {
+                    output.textContent = text;
+                }
+                
+                terminal.appendChild(output);
+                
+                await new Promise(resolve => setTimeout(resolve, delay));
+                output.classList.add('visible');
+                scrollToBottom();
+                
+                await new Promise(resolve => setTimeout(resolve, 300));
+            }
+
+            async function typePrompt(text) {
+                prompt.textContent = '';
+                cursor.style.display = 'block';
+                
+                for (let i = 0; i < text.length; i++) {
+                    prompt.textContent += text.charAt(i);
+                    updateCursorPosition();
+                    await new Promise(resolve => setTimeout(resolve, 50));
+                }
+                scrollToBottom();
+            }
+
+            window.handleCommand = async function(cmd) {
+                const cmdLine = '/home/guest> ' + cmd;
+                await createOutput(cmdLine);
+                
+                const output = commands[cmd];
+                if (output) {
+                    for (let line of output) {
+                        await createOutput(line, true, 150);
+                    }
+                } else {
+                    await createOutput('Command not found: ' + cmd);
+                }
+                
+                input.value = '';
+                updateCursorPosition();
+                scrollToBottom();
+            };
+
+            async function initialize() {
+                await typePrompt('/home/guest> ');
+                
+                for (let header of headerTexts) {
+                    await new Promise(resolve => setTimeout(resolve, 300));
+                    header.classList.add('visible');
+                }
+                
+                await new Promise(resolve => setTimeout(resolve, 500));
+                input.style.display = '';
+                input.focus();
+                await handleCommand('ls');
+            }
+
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    handleCommand(input.value.trim());
+                }
+            });
+
+            prompt.addEventListener('click', () => {
+                handleCommand('ls');
+            });
+
+            document.addEventListener('click', () => input.focus());
+
+            input.addEventListener('input', updateCursorPosition);
+
+            initialize();
+        });
     </script>
-  </head>
-
-  <body>
-
-    <nav class="navbar navbar-default navbar-fixed-top">
-      <div class="container">
-        <div class="navbar-header">
-          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          <span class="navbar-brand">Hossein <b>Ghodrati Noushahr</b></span>
-        </div>
-        <div id="navbar" class="collapse navbar-collapse">
-          <ul class="nav navbar-nav">
-            <li class="active"><a href="index.html">About</a></li>
-            <li><a href="contact.html">Contact</a></li>
-          </ul>
-        </div><!--/.nav-collapse -->
-      </div>
-    </nav>
-
-    <div class="container">
-
-      <div class="starter-template">
-        <h2 class="text-left">About</h2>
-        <p class="lead text-left">
-          Data &amp; Technology Leader
-        </p>
-        <p class="text-left">
-          Mission-driven data & technology leader with vast knowledge in e-commerce, Machine Learning development and data-informed decision making, and proven success in building great products, teams and leaders with 10+ years of experience, ranging from top-tier strategy consulting, Silicon Valley start-ups to high-growth NASDAQ-listed technology firms.
-        </p>
-        <p class="text-left">
-          I am passionate about data used to tackle real problems at scale: the distributed systems that are required to capture, process and persist it; statistical methods, models and algorithms to detect patterns, surface insights and enable intelligent products that automate processes and augment humans.
-        </p>
-        <p class="text-left">
-          I equally enjoy building new products and solutions from scratch as well as scaling and optimizing existing ones, always done from a deeply technical and hands-on level with thorough analysis, algorithmic design, systems architecture and modeling.
-        </p>
-
-        <h4 class="text-left">Areas of greatest experience and interest</h4>
-        <div class="row">
-          <div class="col-sm-4">
-            <div class="panel panel-default">
-              <div class="panel-heading">
-                <h3 class="panel-title">Analytics</h3>
-              </div>
-              <div class="panel-body">
-                strategy & business analysis, pricing, sales & marketing analytics, product analytics, web analytics, a/b testing, analytics engineering
-              </div>
-            </div>
-
-
-          </div><!-- /.col-sm-4 -->
-          <div class="col-sm-4">
-            <div class="panel panel-default">
-              <div class="panel-heading">
-                <h3 class="panel-title">Data Science</h3>
-              </div>
-              <div class="panel-body">
-                personalization, recommender systems, propensity modeling, natural language processing, text mining, information retrieval, computer vision, anomaly detection
-              </div>
-            </div>
-          </div><!-- /.col-sm-4 -->
-
-          <div class="col-sm-4">
-            <div class="panel panel-default">
-              <div class="panel-heading">
-                <h3 class="panel-title">Software Engineering</h3>
-              </div>
-              <div class="panel-body">
-                agile software development, extreme programming, test-driven development, continuous integration / deployment, observability
-              </div>
-            </div>
-          </div><!-- /.col-sm-4 -->
-        </div>
-
-
-        <h4 class="text-left">Technical skills</h4>
-        <div class="row">
-          <div class="col-sm-4">
-            <div class="panel panel-default">
-              <div class="panel-heading">
-                <h3 class="panel-title">Programming</h3>
-              </div>
-              <div class="panel-body">
-                software design patterns and practices, object-oriented design, event-driven architectures, microservices, unit testing, integration testing, performance testing; Python, Java, Scala, Perl
-              </div>
-            </div>
-            <div class="panel panel-default">
-              <div class="panel-heading">
-                <h3 class="panel-title">Machine Learning</h3>
-              </div>
-              <div class="panel-body">
-                linear and non-linear models for classification, ranking and function approximation; scikit-learn, PyTorch, Keras, MLflow, hyperopt, imbalanced-learn, NumPy, SciPy, spaCy
-              </div>
-            </div>
-
-          </div><!-- /.col-sm-4 -->
-          <div class="col-sm-4">
-            <div class="panel panel-default">
-              <div class="panel-heading">
-                <h3 class="panel-title">Data Analysis</h3>
-              </div>
-              <div class="panel-body">
-                descriptive and inferential statistics, hypothesis testing, multivariate analysis, clustering; pandas, statsmodels, SAS, R, SPSS
-              </div>
-            </div>
-            <div class="panel panel-default">
-              <div class="panel-heading">
-                <h3 class="panel-title">Data Management, Databases &amp; Distributed Computing</h3>
-              </div>
-              <div class="panel-body">
-                SQL (DDL, DML, DCL), relational data modeling, dimensional data modeling, Snowflake, PostgreSQL, MySQL, MS SQL, Redis, Apache Spark (PySpark, Spark SQL), Apache Parquet, S3, Apache Airflow, Prefect
-              </div>
-            </div>
-          </div><!-- /.col-sm-4 -->
-          <div class="col-sm-4">
-            <div class="panel panel-default">
-              <div class="panel-heading">
-                <h3 class="panel-title">BI &amp; Analytics Tools</h3>
-              </div>
-              <div class="panel-body">
-                Looker, Tableau, data build tool (dbt)
-              </div>
-            </div>
-            <div class="panel panel-default">
-              <div class="panel-heading">
-                <h3 class="panel-title">Deployment &amp; DevOps</h3>
-              </div>
-              <div class="panel-body">
-                Unix shell, git, Docker, AWS, Azure, Buildkite, CircleCI, pytest, setuptools, CloudFormation, Prometheus
-              </div>
-            </div>
-            <div class="panel panel-default">
-              <div class="panel-heading">
-                <h3 class="panel-title">Other</h3>
-              </div>
-              <div class="panel-body">
-                HTML, JavaScript, CSS, LaTeX
-              </div>
-            </div>
-          </div><!-- /.col-sm-4 -->
-        </div>
-
-        <a href="https://www.linkedin.com/in/hghodrati" target="_blank"><img src="assets/img/linkedin.svg" class="img-fluid pull-xs-left" alt="My LinkedIn profile" width="5%" height="auto"></a>
-
-      </div>
-
-    </div><!-- /.container -->
-
-
-    <!-- Bootstrap core JavaScript
-    ================================================== -->
-    <!-- Placed at the end of the document so the pages load faster -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-    <script>window.jQuery || document.write('<script src="assets/js/vendor/jquery.min.js"><\/script>')</script>
-    <script src="dist/js/bootstrap.min.js"></script>
-    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-    <script src="assets/js/ie10-viewport-bug-workaround.js"></script>
-  </body>
+</body>
 </html>
